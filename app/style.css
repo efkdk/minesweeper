@@ -1,0 +1,40 @@
+#root {
+  display: grid;
+  gap: 5px;
+}
+
+.cell {
+  box-sizing: border-box;
+  display: block;
+  text-align: center;
+}
+
+.flagged {
+  background-color: blue !important;
+}
+
+.type10 {
+  background-color: pink;
+}
+
+.type11 {
+  background-color: red;
+}
+
+.type1 {
+}
+
+.closed {
+  background-color: gray;
+}
+
+.opened {
+  border: 1px solid gray;
+}
+
+.size-34 {
+  width: 34px;
+  height: 34px;
+  font-size: 15px;
+  line-height: 33px;
+}
