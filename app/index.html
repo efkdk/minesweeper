@@ -8,10 +8,62 @@
 </head>
 <body>
     <h1>Minesweeper</h1>
+    <label for="size-select">
+        <p>Select size</p>
+        <select name="size" id="size-select">
+            <option value="10">10</option>
+            <option value="12">12</option>
+            <option value="14">14</option>
+            <option value="16">16</option>
+            <option value="18">18</option>
+            <option value="20">20</option>
+            <option value="22">22</option>
+            <option selected value="24">24</option>
+            <option value="26">26</option>
+            <option value="28">28</option>
+            <option value="30">30</option>
+            <option value="32">32</option>
+            <option value="34">34</option>
+            <option value="36">36</option>
+            <option value="38">38</option>
+            <option value="40">40</option>
+            <option value="42">42</option>
+            <option value="44">44</option>
+            <option value="46">46</option>
+            <option value="48">48</option>
+            <option value="50">50</option>
+            <option value="52">52</option>
+            <option value="54">54</option>
+            <option value="56">56</option>
+            <option value="58">58</option>
+            <option value="60">60</option>
+        </select>
+    </label>
     <div id="root"></div>
     <p id="game-status"></p>
     <button id="restart">Restart</button>
     <p>Flags left: <span id="flags-count"></span></p>
+    <div class="levels" id="levels">
+        <button id="novice" class="level__item">Novice</button>
+        <button id="amateur" class="level__item">Amateur</button>
+        <button id="professional" class="level__item">Professional</button>
+        <button id="custom" class="level__item">Custom</button>
+    </div>
+    <form class="settings" id="custom-settings">
+        <label for="widthInput">
+            Width:
+            <input type="number" name="widthInput" id="widthInput">
+        </label>
+        <label for="heightInput">
+            Height:
+            <input type="number" name="heightInput" id="heightInput">
+        </label>
+        <label for="bombsInput">
+            Bombs:
+            <input type="number" name="bombsInput" min="1" id="bombsInput">
+        </label>
+        <input type="submit" value="Apply">
+    </form>
     <script src="index.js"></script>    
 </body>
 </html>

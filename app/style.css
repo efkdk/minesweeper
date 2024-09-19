@@ -1,6 +1,10 @@
+a {
+  text-decoration: none;
+  color: black;
+}
+
 #root {
   display: grid;
-  gap: 5px;
 }
 
 .cell {
@@ -11,6 +15,23 @@
 
 .flagged {
   background-color: blue !important;
+}
+
+.levels {
+  display: flex;
+  gap: 1rem;
+}
+.level__item {
+}
+.level__item:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+.settings {
+  display: none;
+}
+.settings._active {
+  display: block;
 }
 
 .type10 {

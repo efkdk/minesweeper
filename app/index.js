@@ -2,16 +2,37 @@ const root = document.getElementById("root");
 const gameStatus = document.getElementById("game-status");
 const restartButton = document.getElementById("restart");
 const flagsCount = document.getElementById("flags-count");
+const sizeSelect = document.getElementById("size-select");
+const customSettings = document.getElementById("custom-settings");
 
-// configuration
-let width = 9,
-  height = 9,
-  bombs = 10,
-  flags = bombs,
-  size = 34;
+//configs
+let noviceConfig = {
+  width: 9,
+  height: 9,
+  bombs: 10,
+};
+
+let amateurConfig = {
+  width: 16,
+  height: 16,
+  bombs: 40,
+};
+
+let professionalConfig = {
+  width: 30,
+  height: 16,
+  bombs: 99,
+};
+
+// default configuration
+let { width, height, bombs } = noviceConfig;
+let flags = bombs;
+let size = 24;
 
 flagsCount.textContent = flags;
 root.style.gridTemplateColumns = `repeat(${width}, ${size}px)`;
+root.style.gridTemplateRows = `repeat(${height}, ${size}px)`;
+root.style.gap = `${size / 7}px`;
 
 class Cell {
   constructor(x, y) {
@@ -128,6 +149,10 @@ const init = () => {
 let field = init();
 
 const render = () => {
+  root.innerHTML = "";
+  root.style.gridTemplateColumns = `repeat(${width}, ${size}px)`;
+  root.style.gridTemplateRows = `repeat(${height}, ${size}px)`;
+  root.style.gap = `${size / 7}px`;
   eachCell((cell) => {
     let cellElement = document.createElement("div");
     cellElement.classList.add("cell", "closed", `size-${size}`);
@@ -173,9 +198,17 @@ const restart = () => {
   root.innerHTML = "";
   gameStatus.textContent = "";
   field = init();
+  console.log(field);
   render();
   flags = bombs;
   flagsCount.textContent = flags;
+};
+
+const setConfiguration = (settings) => {
+  width = +settings.width;
+  height = +settings.height;
+  bombs = +settings.bombs;
+  restart();
 };
 
 document.addEventListener("click", (event) => {
@@ -195,8 +228,30 @@ document.addEventListener("click", (event) => {
       });
     }
   }
+
   if (event.target.id === "restart") {
     restart();
+  }
+
+  if (event.target.id === "custom") {
+    customSettings.classList.toggle("_active");
+  }
+
+  if (event.target.id === "novice" || "amateur" || "professional") {
+    switch (event.target.id) {
+      case "novice": {
+        setConfiguration(noviceConfig);
+        break;
+      }
+      case "amateur": {
+        setConfiguration(amateurConfig);
+        break;
+      }
+      case "professional": {
+        setConfiguration(professionalConfig);
+        break;
+      }
+    }
   }
 });
 
@@ -209,4 +264,33 @@ document.addEventListener("contextmenu", (event) => {
   }
 });
 
-console.log(field);
+customSettings.addEventListener("submit", (event) => {
+  event.preventDefault();
+  let widthFromSettings = +widthInput.value;
+  let heightFromSettings = +heightInput.value;
+  let bombsFromSettings = +bombsInput.value;
+  //min max bombs
+  if ((widthFromSettings * heightFromSettings) / bombsFromSettings <= 4) {
+    bombsInput.value = Math.floor((widthFromSettings * heightFromSettings) / 4);
+    bombsFromSettings = +bombsInput.value;
+  } else if (
+    (widthFromSettings * heightFromSettings) / bombsFromSettings >=
+    15
+  ) {
+    bombsInput.value = Math.floor(
+      (widthFromSettings * heightFromSettings) / 15
+    );
+    bombsFromSettings = +bombsInput.value;
+  }
+  let customSettingsObject = {
+    width: widthFromSettings,
+    height: heightFromSettings,
+    bombs: bombsFromSettings,
+  };
+  setConfiguration(customSettingsObject);
+});
+
+sizeSelect.addEventListener("change", (event) => {
+  size = +sizeSelect.value;
+  render();
+});
