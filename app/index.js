@@ -5,34 +5,61 @@ const flagsCount = document.getElementById("flags-count");
 const sizeSelect = document.getElementById("size-select");
 const customSettings = document.getElementById("custom-settings");
 
-//configs
-let noviceConfig = {
-  width: 9,
-  height: 9,
-  bombs: 10,
-};
-
-let amateurConfig = {
-  width: 16,
-  height: 16,
-  bombs: 40,
-};
-
-let professionalConfig = {
-  width: 30,
-  height: 16,
-  bombs: 99,
+const configs = {
+  novice: {
+    width: 9,
+    height: 9,
+    bombs: 10,
+  },
+  amateur: {
+    width: 16,
+    height: 16,
+    bombs: 40,
+  },
+  professional: {
+    width: 30,
+    height: 16,
+    bombs: 99,
+  },
 };
 
 // default configuration
-let { width, height, bombs } = noviceConfig;
+let { width, height, bombs } = configs.novice;
 let flags = bombs;
 let size = 24;
 
-flagsCount.textContent = flags;
-root.style.gridTemplateColumns = `repeat(${width}, ${size}px)`;
-root.style.gridTemplateRows = `repeat(${height}, ${size}px)`;
-root.style.gap = `${size / 7}px`;
+const updateFlagsCount = () => {
+  flagsCount.textContent = flags;
+};
+
+const setGridStyles = () => {
+  root.style.gridTemplateColumns = `repeat(${width}, ${size / 16}rem)`;
+  root.style.gridTemplateRows = `repeat(${height}, ${size / 16}rem)`;
+  root.style.gap = `${size / 7}px`;
+};
+
+const validateCustomSettings = (width, height, bombs) => {
+  const maxWidth = 100,
+    maxHeight = 100;
+  width = width > maxWidth ? maxWidth : width;
+  height = height > maxHeight ? maxHeight : height;
+  const maxBombs = Math.floor((width * height) / 4);
+  const minBombs = Math.floor((width * height) / 15);
+
+  const safeConfiguration = {
+    width,
+    height,
+    bombs: bombs > maxBombs ? maxBombs : bombs < minBombs ? minBombs : bombs,
+  };
+  return safeConfiguration;
+};
+
+const checkBombsAround = (cell) => {
+  return cell.cellsAround(field).filter((cell) => cell.bomb).length;
+};
+
+updateFlagsCount();
+setGridStyles();
 
 class Cell {
   constructor(x, y) {
@@ -42,79 +69,90 @@ class Cell {
     this.flagged = false;
     this.open = false;
   }
-}
 
-Cell.prototype.draw = function (field) {
-  console.log("draw");
-  flagsCount.textContent = flags;
-  checkGameWin();
-  const cellElement = document.querySelector(
-    `[data-x="${this.x}"][data-y="${this.y}"]`
-  );
-  let bombsAround = this.cellsAround(field).filter((cell) => cell.bomb).length;
-  cellElement.classList.value = `cell size-${size}`;
-  if (this.flagged) {
-    cellElement.classList.add("flagged");
-  } else if (!this.open) {
-    cellElement.classList.add("closed");
-  } else if (this.open) {
-    cellElement.classList.add("opened");
-    if (this.bomb) {
-      cellElement.classList.add("type10");
+  draw() {
+    const cellElement = document.querySelector(
+      `[data-x="${this.x}"][data-y="${this.y}"]`
+    );
+    const bombsAround = checkBombsAround(this);
+    cellElement.className = `cell size-${size}`;
+    if (this.flagged) {
+      cellElement.classList.add("flagged");
+    } else if (!this.open) {
+      cellElement.classList.add("closed");
     } else {
-      cellElement.classList.add(`type${bombsAround}`);
-      if (bombsAround > 0) {
-        cellElement.textContent = bombsAround;
-      }
-    }
-  }
-};
-
-Cell.prototype.cellsAround = function (field) {
-  let cells = [];
-
-  for (let y = this.y - 1; y <= this.y + 1; y++) {
-    for (let x = this.x - 1; x <= this.x + 1; x++) {
-      if (x === this.x && y === this.y) continue;
-      if (x >= 0 && x < width && y >= 0 && y < height) {
-        cells.push(field[y][x]);
+      cellElement.classList.add("opened");
+      if (this.bomb) {
+        cellElement.classList.add("type10");
+      } else {
+        cellElement.classList.add(`type${bombsAround}`);
       }
     }
   }
 
-  return cells;
-};
-
-Cell.prototype.click = function (field) {
-  if (this.open) {
-    return;
-  } else if (this.flagged) {
-    return;
-  } else if (this.bomb) {
-    this.open = true;
-    this.draw(field);
-    gameOver();
-  } else {
-    this.open = true;
-    let cells = this.cellsAround(field);
-    if (cells.filter((cell) => cell.bomb).length === 0) {
-      cells.forEach((cell) => {
-        cell.click(field);
-      });
+  cellsAround(field) {
+    let cells = [];
+    for (let y = this.y - 1; y <= this.y + 1; y++) {
+      for (let x = this.x - 1; x <= this.x + 1; x++) {
+        if (x === this.x && y === this.y) continue;
+        if (x >= 0 && x < width && y >= 0 && y < height) {
+          cells.push(field[y][x]);
+        }
+      }
     }
-    this.draw(field);
+    return cells;
   }
-};
 
-Cell.prototype.flag = function () {
-  if (this.open) {
-    return;
-  } else {
+  click(field) {
+    if ((this.open && checkBombsAround(this, field) === 0) || this.flagged)
+      return;
+    this.open = true;
+
+    if (this.open && checkBombsAround(this, field) > 0) {
+      let flagsAround = this.cellsAround(field).filter(
+        (cell) => cell.flagged
+      ).length;
+      if (flagsAround === checkBombsAround(this, field)) {
+        this.cellsAround(field)
+          .filter((cell) => !cell.open && !cell.flagged)
+          .forEach((neighbor) => {
+            neighbor.click(field);
+          });
+      }
+    }
+
+    if (!this.bomb) {
+      let toOpen = [this];
+      while (toOpen.length > 0) {
+        const current = toOpen.pop();
+        const bombsAround = checkBombsAround(current, field);
+
+        if (bombsAround === 0) {
+          current.cellsAround(field).forEach((neighbor) => {
+            if (!neighbor.open && !neighbor.flagged && !neighbor.bomb) {
+              neighbor.open = true;
+              toOpen.push(neighbor);
+            }
+          });
+        }
+        current.draw(field);
+      }
+    } else {
+      this.draw(field);
+      gameOver();
+    }
+    checkGameWin();
+  }
+
+  flag() {
+    if (this.open) return;
+
     this.flagged = !this.flagged;
     this.flagged ? flags-- : flags++;
-    this.draw(field);
+    updateFlagsCount();
+    this.draw();
   }
-};
+}
 
 const eachCell = (callback) => {
   field.forEach((row) => {
@@ -122,6 +160,24 @@ const eachCell = (callback) => {
       callback(cell);
     });
   });
+};
+
+const generateBombs = (field, bombs) => {
+  let positions = [];
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      positions.push([x, y]);
+    }
+  }
+
+  for (let i = 0; i < bombs; i++) {
+    let j = Math.floor(Math.random() * (positions.length - i)) + i;
+    [positions[i], positions[j]] = [positions[j], positions[i]];
+    const [x, y] = positions[i];
+    field[y][x].bomb = true;
+  }
+
+  return field;
 };
 
 const init = () => {
@@ -133,61 +189,44 @@ const init = () => {
     }
     field.push(row);
   }
-  for (let i = 0; i < bombs; i++) {
-    while (true) {
-      let x = Math.floor(Math.random() * width);
-      let y = Math.floor(Math.random() * height);
-      if (!field[y][x].bomb) {
-        field[y][x].bomb = true;
-        break;
-      }
-    }
-  }
-  return field;
+  return generateBombs(field, bombs);
 };
 
 let field = init();
 
 const render = () => {
   root.innerHTML = "";
-  root.style.gridTemplateColumns = `repeat(${width}, ${size}px)`;
-  root.style.gridTemplateRows = `repeat(${height}, ${size}px)`;
-  root.style.gap = `${size / 7}px`;
+  const fragment = document.createDocumentFragment();
+
   eachCell((cell) => {
     let cellElement = document.createElement("div");
     cellElement.classList.add("cell", "closed", `size-${size}`);
     cellElement.dataset.x = cell.x;
     cellElement.dataset.y = cell.y;
-    root.append(cellElement);
+    fragment.appendChild(cellElement);
   });
+
+  root.appendChild(fragment);
 };
 
 render();
 
 const openAll = () => {
   eachCell((cell) => {
-    cell.open = true;
+    if (!cell.open) {
+      cell.open = true;
+      cell.draw(field);
+    }
   });
-  draw();
 };
 
-function draw() {
-  eachCell((cell) => {
-    cell.draw(field);
-  });
-}
 const gameOver = () => {
   gameStatus.textContent = "You lose :(";
   openAll();
 };
 
 const checkGameWin = () => {
-  let openCells = 0;
-  eachCell((cell) => {
-    if (cell.open) {
-      openCells++;
-    }
-  });
+  let openCells = field.flat().filter((cell) => cell.open).length;
   if (openCells === width * height - bombs) {
     gameStatus.textContent = "You win :)";
     openAll();
@@ -198,99 +237,76 @@ const restart = () => {
   root.innerHTML = "";
   gameStatus.textContent = "";
   field = init();
-  console.log(field);
   render();
   flags = bombs;
-  flagsCount.textContent = flags;
+  updateFlagsCount();
+  setGridStyles();
 };
 
 const setConfiguration = (settings) => {
-  width = +settings.width;
-  height = +settings.height;
-  bombs = +settings.bombs;
+  const configuration = validateCustomSettings(
+    settings.width,
+    settings.height,
+    settings.bombs
+  );
+
+  width = configuration.width;
+  height = configuration.height;
+  bombs = configuration.bombs;
+
   restart();
+  return configuration;
 };
 
 document.addEventListener("click", (event) => {
-  if (event.target.classList.contains("cell")) {
-    const x = +event.target.dataset.x,
-      y = +event.target.dataset.y;
-    field[y][x].click(field);
+  const { target } = event;
 
-    let cells = field[y][x].cellsAround(field);
-    let bombsAround = cells.filter((cell) => cell.bomb).length;
-    let flagsAround = cells.filter((cell) => cell.flagged).length;
-    if (bombsAround === flagsAround && bombsAround > 0) {
-      cells.forEach((cell) => {
-        if (!cell.flagged) {
-          cell.click(field);
-        }
-      });
-    }
-  }
-
-  if (event.target.id === "restart") {
+  if (target.classList.contains("cell")) {
+    handleCellClick(target);
+  } else if (target.id === "restart") {
     restart();
-  }
-
-  if (event.target.id === "custom") {
+  } else if (target.id === "custom") {
     customSettings.classList.toggle("_active");
-  }
-
-  if (event.target.id === "novice" || "amateur" || "professional") {
-    switch (event.target.id) {
-      case "novice": {
-        setConfiguration(noviceConfig);
-        break;
-      }
-      case "amateur": {
-        setConfiguration(amateurConfig);
-        break;
-      }
-      case "professional": {
-        setConfiguration(professionalConfig);
-        break;
-      }
-    }
+  } else if (["novice", "amateur", "professional"].includes(target.id)) {
+    setConfiguration(configs[target.id]);
   }
 });
+
+const handleCellClick = (target) => {
+  const x = +target.dataset.x;
+  const y = +target.dataset.y;
+  field[y][x].click(field);
+};
 
 document.addEventListener("contextmenu", (event) => {
   event.preventDefault();
   if (event.target.classList.contains("cell")) {
-    const x = +event.target.dataset.x,
-      y = +event.target.dataset.y;
+    const x = +event.target.dataset.x;
+    const y = +event.target.dataset.y;
     field[y][x].flag();
   }
 });
 
 customSettings.addEventListener("submit", (event) => {
   event.preventDefault();
-  let widthFromSettings = +widthInput.value;
-  let heightFromSettings = +heightInput.value;
+  const widthFromSettings = +widthInput.value;
+  const heightFromSettings = +heightInput.value;
   let bombsFromSettings = +bombsInput.value;
-  //min max bombs
-  if ((widthFromSettings * heightFromSettings) / bombsFromSettings <= 4) {
-    bombsInput.value = Math.floor((widthFromSettings * heightFromSettings) / 4);
-    bombsFromSettings = +bombsInput.value;
-  } else if (
-    (widthFromSettings * heightFromSettings) / bombsFromSettings >=
-    15
-  ) {
-    bombsInput.value = Math.floor(
-      (widthFromSettings * heightFromSettings) / 15
-    );
-    bombsFromSettings = +bombsInput.value;
-  }
+
   let customSettingsObject = {
     width: widthFromSettings,
     height: heightFromSettings,
     bombs: bombsFromSettings,
   };
-  setConfiguration(customSettingsObject);
+
+  //validating in setConfiguration func
+  bombsInput.value = setConfiguration(customSettingsObject).bombs;
+  widthInput.value = setConfiguration(customSettingsObject).width;
+  heightInput.value = setConfiguration(customSettingsObject).height;
 });
 
 sizeSelect.addEventListener("change", (event) => {
   size = +sizeSelect.value;
-  render();
+  setGridStyles();
+  restart();
 });

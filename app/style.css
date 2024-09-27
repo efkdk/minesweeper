@@ -21,15 +21,16 @@ a {
   display: flex;
   gap: 1rem;
 }
-.level__item {
-}
+
 .level__item:hover {
   cursor: pointer;
   text-decoration: underline;
 }
+
 .settings {
   display: none;
 }
+
 .settings._active {
   display: block;
 }
@@ -41,8 +42,36 @@ a {
 .type11 {
   background-color: red;
 }
+.type1::after {
+  content: "1";
+}
 
-.type1 {
+.type2::after {
+  content: "2";
+}
+
+.type3::after {
+  content: "3";
+}
+
+.type4::after {
+  content: "4";
+}
+
+.type5::after {
+  content: "5";
+}
+
+.type6::after {
+  content: "6";
+}
+
+.type7::after {
+  content: "7";
+}
+
+.type8::after {
+  content: "8";
 }
 
 .closed {
@@ -58,4 +87,12 @@ a {
   height: 34px;
   font-size: 15px;
   line-height: 33px;
+}
+
+#custom-settings {
+  display: none;
+}
+
+#custom-settings._active {
+  display: block;
 }
