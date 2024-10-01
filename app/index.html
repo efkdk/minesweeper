@@ -52,11 +52,11 @@
     <form id="custom-settings">
         <label for="widthInput">
             Width:
-            <input type="number" name="widthInput" id="widthInput">
+            <input type="number" max="100" min="9" name="widthInput" id="widthInput">
         </label>
         <label for="heightInput">
             Height:
-            <input type="number" name="heightInput" id="heightInput">
+            <input type="number" max="100" min="9" name="heightInput" id="heightInput">
         </label>
         <label for="bombsInput">
             Bombs:
@@ -64,6 +64,6 @@
         </label>
         <input type="submit" value="Apply">
     </form>
-    <script src="index.js"></script>    
+    <script type="module" src="index.js"></script>    
 </body>
 </html>
