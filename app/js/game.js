@@ -1,6 +1,7 @@
 import Cell from "./cell.js";
 import Context, { selectField } from "./context.js";
 import { eachCell, setGridStyles, updateFlagsCount } from "./helpers.js";
+import Timer from "./timer.js";
 
 const restartButton = document.getElementById("restart");
 
@@ -63,6 +64,7 @@ export const generateBombs = (field, { width, height, bombs }) => {
 export const gameOver = (field) => {
   const classes = ["restart-button", "lose"];
   restartButton.classList.value = classes.join(" ");
+  Timer.stop();
   eachCell(field, (cell) => {
     if (!cell.open) {
       cell.open = true;
@@ -79,6 +81,8 @@ export const checkGameWin = (field) => {
   if (openCells === width * height - bombs) {
     const classes = ["restart-button", "win"];
     restartButton.classList.value = classes.join(" ");
+    console.log(Timer);
+    Timer.stop();
     eachCell(field, (cell) => {
       if (!cell.open) {
         cell.open = true;
@@ -122,6 +126,7 @@ export const restartGame = () => {
   root.innerHTML = "";
   const classes = ["restart-button"];
   restartButton.classList.value = classes.join(" ");
+  Timer.reset();
   startGame();
 };
 

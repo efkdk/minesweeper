@@ -6,6 +6,7 @@ import {
   gameOver,
   openNeighborCells,
 } from "./game.js";
+import Timer from "./timer.js";
 
 class Cell {
   constructor(x, y) {
@@ -56,13 +57,15 @@ class Cell {
 
   click(field) {
     const bombsAround = checkBombsAround(this, field);
+    const openedCells = field.flat().filter((cell) => cell.open).length;
+    if (openedCells === 0) {
+      Timer.start();
+    }
     if ((this.open && bombsAround === 0) || this.flagged) return;
     if (this.bomb) {
       gameOver(field);
       return;
     }
-    //bug
-    this.open = true;
 
     if (this.open && bombsAround > 0) {
       let flagsAround = this.cellsAround(field).filter(
@@ -76,6 +79,8 @@ class Cell {
           });
       }
     }
+
+    this.open = true;
 
     if (!this.bomb) {
       openNeighborCells(this, field);

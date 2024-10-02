@@ -1,6 +1,7 @@
 import Context from "./context.js";
 
 const flagsCount = document.getElementById("flags-count");
+const timer = document.getElementById("timer");
 
 export const setGridStyles = () => {
   const { width, height, size } = Context.getState();
@@ -71,4 +72,17 @@ export const eachCell = (field, callback) => {
       callback(cell);
     });
   });
+};
+
+export const updateTimer = (seconds) => {
+  seconds = seconds > 999 ? 999 : seconds;
+  const secondsNumbers = seconds.toString().padStart(3, "0").split("");
+
+  for (let i = 0; i < secondsNumbers.length; i++) {
+    let currentElement = timer.children[i];
+    let classes = ["counter__element", `type-num${secondsNumbers[i]}`];
+    if (!currentElement.classList.contains(`type-num${secondsNumbers[i]}`)) {
+      currentElement.classList.value = classes.join(" ");
+    }
+  }
 };
