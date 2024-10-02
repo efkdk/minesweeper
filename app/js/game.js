@@ -2,7 +2,7 @@ import Cell from "./cell.js";
 import Context, { selectField } from "./context.js";
 import { eachCell, setGridStyles, updateFlagsCount } from "./helpers.js";
 
-const gameStatus = document.getElementById("game-status");
+const restartButton = document.getElementById("restart");
 
 /**
  * @param {Object} cell
@@ -61,7 +61,8 @@ export const generateBombs = (field, { width, height, bombs }) => {
  * @returns {void}
  */
 export const gameOver = (field) => {
-  gameStatus.textContent = "You lose :(";
+  const classes = ["restart-button", "lose"];
+  restartButton.classList.value = classes.join(" ");
   eachCell(field, (cell) => {
     if (!cell.open) {
       cell.open = true;
@@ -76,7 +77,8 @@ export const checkGameWin = (field) => {
   let height = field.length;
   let bombs = field.flat().filter((cell) => cell.bomb).length;
   if (openCells === width * height - bombs) {
-    gameStatus.textContent = "You win :)";
+    const classes = ["restart-button", "win"];
+    restartButton.classList.value = classes.join(" ");
     eachCell(field, (cell) => {
       if (!cell.open) {
         cell.open = true;
@@ -118,7 +120,8 @@ const renderField = () => {
 
 export const restartGame = () => {
   root.innerHTML = "";
-  gameStatus.textContent = "";
+  const classes = ["restart-button"];
+  restartButton.classList.value = classes.join(" ");
   startGame();
 };
 

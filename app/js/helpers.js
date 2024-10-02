@@ -1,18 +1,26 @@
 import Context from "./context.js";
 
 const flagsCount = document.getElementById("flags-count");
-const root = document.getElementById("root");
 
 export const setGridStyles = () => {
   const { width, height, size } = Context.getState();
-  root.style.gridTemplateColumns = `repeat(${width}, ${size / 16}rem)`;
-  root.style.gridTemplateRows = `repeat(${height}, ${size / 16}rem)`;
-  root.style.gap = `${size / 7}px`;
+  document.documentElement.style.setProperty("--cell-size", `${size / 16}rem`);
+  document.documentElement.style.setProperty("--field-width", width);
+  document.documentElement.style.setProperty("--field-height", height);
 };
 
 export const updateFlagsCount = () => {
-  const { flags } = Context.getState();
-  flagsCount.textContent = flags;
+  let { flags } = Context.getState();
+  flags = flags > 999 ? 999 : flags < -99 ? -99 : flags;
+  const flagsNumbers = flags.toString().padStart(3, "0").split("");
+
+  for (let i = 0; i < flagsNumbers.length; i++) {
+    let currentElement = flagsCount.children[i];
+    let classes = ["counter__element", `type-num${flagsNumbers[i]}`];
+    if (!currentElement.classList.contains(`type-num${flagsNumbers[i]}`)) {
+      currentElement.classList.value = classes.join(" ");
+    }
+  }
 };
 
 export const incrementFlagsCount = () => {

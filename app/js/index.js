@@ -38,6 +38,7 @@ document.addEventListener("click", (event) => {
   } else if (target.id === "custom") {
     customSettings.classList.toggle("_active");
   } else if (["novice", "amateur", "professional"].includes(target.id)) {
+    customSettings.classList.remove("_active");
     Context.setState(validateConfig(configs[target.id]));
     restartGame();
   }

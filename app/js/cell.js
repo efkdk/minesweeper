@@ -25,6 +25,7 @@ class Cell {
     let classes = ["cell", `size-${size}`];
     if (this.flagged) {
       classes.push("flagged");
+      classes.push("closed");
     } else if (!this.open) {
       classes.push("closed");
     } else {
@@ -54,12 +55,13 @@ class Cell {
   }
 
   click(field) {
+    const bombsAround = checkBombsAround(this, field);
+    if ((this.open && bombsAround === 0) || this.flagged) return;
     if (this.bomb) {
       gameOver(field);
       return;
     }
-    const bombsAround = checkBombsAround(this, field);
-    if ((this.open && bombsAround === 0) || this.flagged) return;
+    //bug
     this.open = true;
 
     if (this.open && bombsAround > 0) {
