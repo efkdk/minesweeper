@@ -10,23 +10,28 @@ const configs = {
     width: 9,
     height: 9,
     bombs: 10,
+    configName: "novice",
   },
   amateur: {
     width: 16,
     height: 16,
     bombs: 40,
+    configName: "amateur",
   },
   professional: {
     width: 30,
     height: 16,
     bombs: 99,
+    configName: "professional",
   },
 };
 
-// default configuration
-Context.setState({ ...configs.novice, flags: configs.novice.bombs, size: 24 });
-
-startGame();
+const handleCellClick = (target) => {
+  const field = selectField();
+  const x = +target.dataset.x;
+  const y = +target.dataset.y;
+  field[y][x].click(field);
+};
 
 document.addEventListener("click", (event) => {
   const { target } = event;
@@ -39,7 +44,7 @@ document.addEventListener("click", (event) => {
     customSettings.classList.toggle("_active");
   } else if (["novice", "amateur", "professional"].includes(target.id)) {
     customSettings.classList.remove("_active");
-    Context.setState(validateConfig(configs[target.id]));
+    Context.setState(configs[target.id]);
     restartGame();
   } else if (target.id === "theme-toggler") {
     const { theme } = Context.getState();
@@ -47,13 +52,6 @@ document.addEventListener("click", (event) => {
     setStyles();
   }
 });
-
-const handleCellClick = (target) => {
-  const field = selectField();
-  const x = +target.dataset.x;
-  const y = +target.dataset.y;
-  field[y][x].click(field);
-};
 
 document.addEventListener("contextmenu", (event) => {
   event.preventDefault();
@@ -75,6 +73,7 @@ customSettings.addEventListener("submit", (event) => {
     width: widthFromSettings,
     height: heightFromSettings,
     bombs: bombsFromSettings,
+    configName: "custom",
   };
 
   //set config after validation
@@ -89,4 +88,50 @@ customSettings.addEventListener("submit", (event) => {
 sizeSelect.addEventListener("change", (event) => {
   Context.setState({ size: +event.target.value });
   setStyles();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  let settings = localStorage.getItem("settings");
+  if (typeof settings === "string") {
+    settings = JSON.parse(settings);
+    console.log(settings);
+    Context.setState(settings);
+  } else {
+    const isPrefersDarkTheme = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    );
+    // default configuration
+    Context.setState({
+      theme: isPrefersDarkTheme.matches ? "dark" : "light",
+      ...configs.novice,
+      size: 24,
+    });
+  }
+
+  const { configName } = Context.getState();
+  if (configName === "custom") {
+    const { width, height, bombs } = Context.getState();
+    customSettings.classList.add("_active");
+    widthInput.value = width;
+    heightInput.value = height;
+    bombsInput.value = bombs;
+  }
+
+  sizeSelect.value = Context.getState().size;
+  startGame();
+});
+
+window.addEventListener("beforeunload", () => {
+  const { theme, width, height, bombs, size, configName } = Context.getState();
+  localStorage.setItem(
+    "settings",
+    JSON.stringify({
+      theme,
+      width,
+      height,
+      bombs,
+      size,
+      configName,
+    })
+  );
 });

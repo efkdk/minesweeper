@@ -131,8 +131,7 @@ export const restartGame = () => {
 };
 
 export const startGame = () => {
-  Context.setState({ field: createField() });
-  Context.setState({ flags: Context.getState().bombs });
+  Context.setState({ field: createField(), flags: Context.getState().bombs });
   renderField();
   updateFlagsCount();
   setStyles();

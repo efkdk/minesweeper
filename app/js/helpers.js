@@ -43,7 +43,7 @@ const decrementFlagsCount = () => {
  * @returns {Object}
  */
 const validateConfig = (config) => {
-  let { width, height, bombs } = config;
+  let { width, height, bombs, configName } = config;
   const maxWidth = 100,
     maxHeight = 100;
   width = width > maxWidth ? maxWidth : width;
@@ -57,6 +57,7 @@ const validateConfig = (config) => {
     width,
     height,
     bombs: bombs > maxBombs ? maxBombs : bombs < minBombs ? minBombs : bombs,
+    configName,
   };
 
   return safeConfiguration;
