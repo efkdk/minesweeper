@@ -3,14 +3,15 @@ import Context from "./context.js";
 const flagsCount = document.getElementById("flags-count");
 const timer = document.getElementById("timer");
 
-export const setGridStyles = () => {
-  const { width, height, size } = Context.getState();
+const setStyles = () => {
+  const { width, height, size, theme } = Context.getState();
   document.documentElement.style.setProperty("--cell-size", `${size / 16}rem`);
   document.documentElement.style.setProperty("--field-width", width);
   document.documentElement.style.setProperty("--field-height", height);
+  document.documentElement.classList.value = theme;
 };
 
-export const updateFlagsCount = () => {
+const updateFlagsCount = () => {
   let { flags } = Context.getState();
   flags = flags > 999 ? 999 : flags < -99 ? -99 : flags;
   const flagsNumbers = flags.toString().padStart(3, "0").split("");
@@ -24,13 +25,13 @@ export const updateFlagsCount = () => {
   }
 };
 
-export const incrementFlagsCount = () => {
+const incrementFlagsCount = () => {
   const { flags } = Context.getState();
   Context.setState({ flags: flags + 1 });
   updateFlagsCount();
 };
 
-export const decrementFlagsCount = () => {
+const decrementFlagsCount = () => {
   const { flags } = Context.getState();
   Context.setState({ flags: flags - 1 });
   updateFlagsCount();
@@ -41,7 +42,7 @@ export const decrementFlagsCount = () => {
  * @param {Object} config
  * @returns {Object}
  */
-export const validateConfig = (config) => {
+const validateConfig = (config) => {
   let { width, height, bombs } = config;
   const maxWidth = 100,
     maxHeight = 100;
@@ -66,7 +67,7 @@ export const validateConfig = (config) => {
  * @param {Function} callback
  * @returns {void}
  */
-export const eachCell = (field, callback) => {
+const eachCell = (field, callback) => {
   field.forEach((row) => {
     row.forEach((cell) => {
       callback(cell);
@@ -74,7 +75,7 @@ export const eachCell = (field, callback) => {
   });
 };
 
-export const updateTimer = (seconds) => {
+const updateTimer = (seconds) => {
   seconds = seconds > 999 ? 999 : seconds;
   const secondsNumbers = seconds.toString().padStart(3, "0").split("");
 
@@ -85,4 +86,14 @@ export const updateTimer = (seconds) => {
       currentElement.classList.value = classes.join(" ");
     }
   }
+};
+
+export {
+  setStyles,
+  updateFlagsCount,
+  incrementFlagsCount,
+  decrementFlagsCount,
+  validateConfig,
+  eachCell,
+  updateTimer,
 };

@@ -26,16 +26,60 @@ html.light {
   --type8-color: #707070;
 }
 
+html.dark {
+  --background-color: #181a1b;
+  --background-hover-color: #444444;
+  --border-hover-color: #b3b3b3;
+  --border-color: #cccccc;
+  --cell-background-color: #4c545c;
+  --text-color: #ffffff;
+  --minesweeper-first-border-color: #1e262e;
+  --minesweeper-second-border-color: #707880;
+  --mine-touched-color: #ff0000;
+  --type1-color: #7cc7ff;
+  --type2-color: #66c266;
+  --type3-color: #ff7788;
+  --type4-color: #ee88ff;
+  --type5-color: #ddaa22;
+  --type6-color: #66cccc;
+  --type7-color: #999999;
+  --type8-color: #d0d8e0;
+}
+
+#theme-toggler {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  background-color: var(--text-color);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 1.75rem 1.75rem;
+  border-radius: 0.5rem;
+}
+
+#theme-toggler:hover {
+  cursor: pointer;
+}
+
+html.light #theme-toggler {
+  background-image: url("../img/sun.svg");
+}
+
+html.dark #theme-toggler {
+  background-image: url("../img/moon.svg");
+}
+
 body {
   padding: 1rem 0;
   font-family: Arial, Helvetica, sans-serif;
-}
-
-html.light body {
   background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 ._container {
+  position: relative;
   margin: 0 auto;
   max-width: 60.625rem;
   padding: 0 1rem;
@@ -111,7 +155,8 @@ html.light body {
   border-color: var(--minesweeper-first-border-color)
     var(--minesweeper-second-border-color)
     var(--minesweeper-second-border-color) var(--minesweeper-first-border-color);
-  background: url("../img/numbers-panel.svg") center no-repeat;
+  /* background: url("../img/numbers-panel.svg") center no-repeat; */
+  background-color: #000000;
   background-size: cover;
 }
 
@@ -237,9 +282,16 @@ html.light body {
 .more-settings {
   width: 2rem;
   height: 2rem;
-  background-image: url("../img/settings.svg");
   background-size: contain;
   transition: transform 0.3s ease 0s;
+}
+
+html.light .more-settings {
+  background-image: url("../img/light/settings.svg");
+}
+
+html.dark .more-settings {
+  background-image: url("../img/dark/settings.svg");
 }
 
 .more-settings:hover {
@@ -324,23 +376,42 @@ input:focus {
   box-shadow: 0 0 0.5rem rgba(0, 123, 255, 0.2);
 }
 
-.restart-button {
+html.light .restart-button {
   width: calc(var(--cell-size) * 1.625);
   height: calc(var(--cell-size) * 1.625);
-  background-image: url("../img/face-unpressed.svg");
+  background-image: url("../img/light/face-unpressed.svg");
   background-size: cover;
 }
 
-.restart-button.lose {
-  background-image: url("../img/face-lose.svg");
+html.light .restart-button.lose {
+  background-image: url("../img/light/face-lose.svg");
 }
 
-.restart-button.win {
-  background-image: url("../img/face-win.svg");
+html.light .restart-button.win {
+  background-image: url("../img/light/face-win.svg");
 }
 
-.restart-button:active {
-  background-image: url("../img/face-pressed.svg");
+html.light .restart-button:active {
+  background-image: url("../img/light/face-pressed.svg");
+}
+
+html.dark .restart-button {
+  width: calc(var(--cell-size) * 1.625);
+  height: calc(var(--cell-size) * 1.625);
+  background-image: url("../img/dark/face-unpressed.svg");
+  background-size: cover;
+}
+
+html.dark .restart-button.lose {
+  background-image: url("../img/dark/face-lose.svg");
+}
+
+html.dark .restart-button.win {
+  background-image: url("../img/dark/face-win.svg");
+}
+
+html.dark .restart-button:active {
+  background-image: url("../img/dark/face-pressed.svg");
 }
 
 select {
@@ -350,8 +421,8 @@ select {
   font-family: "Arial", sans-serif;
   border: 2px solid #ccc;
   border-radius: 8px;
-  background-color: #fff;
-  color: #333;
+  background-color: var(--background-color);
+  color: var(--text-color);
   cursor: pointer;
   outline: none;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;

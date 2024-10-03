@@ -1,5 +1,5 @@
 import Context, { selectField } from "./context.js";
-import { setGridStyles, validateConfig } from "./helpers.js";
+import { setStyles, validateConfig } from "./helpers.js";
 import { restartGame, startGame } from "./game.js";
 
 const sizeSelect = document.getElementById("size-select");
@@ -41,6 +41,10 @@ document.addEventListener("click", (event) => {
     customSettings.classList.remove("_active");
     Context.setState(validateConfig(configs[target.id]));
     restartGame();
+  } else if (target.id === "theme-toggler") {
+    const { theme } = Context.getState();
+    Context.setState({ theme: theme === "light" ? "dark" : "light" });
+    setStyles();
   }
 });
 
@@ -84,5 +88,5 @@ customSettings.addEventListener("submit", (event) => {
 
 sizeSelect.addEventListener("change", (event) => {
   Context.setState({ size: +event.target.value });
-  setGridStyles();
+  setStyles();
 });

@@ -1,6 +1,6 @@
 import Cell from "./cell.js";
 import Context, { selectField } from "./context.js";
-import { eachCell, setGridStyles, updateFlagsCount } from "./helpers.js";
+import { eachCell, setStyles, updateFlagsCount } from "./helpers.js";
 import Timer from "./timer.js";
 
 const restartButton = document.getElementById("restart");
@@ -135,5 +135,5 @@ export const startGame = () => {
   Context.setState({ flags: Context.getState().bombs });
   renderField();
   updateFlagsCount();
-  setGridStyles();
+  setStyles();
 };

@@ -1,5 +1,8 @@
 const Context = (() => {
-  let state = {};
+  //initial state
+  let state = {
+    theme: "light",
+  };
 
   let listeners = [];
 
