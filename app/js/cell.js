@@ -96,6 +96,31 @@ class Cell {
     this.flagged ? decrementFlagsCount() : incrementFlagsCount();
     this.draw();
   }
+
+  startSpying(field) {
+    if (checkBombsAround(this) === 0 || !this.open) return;
+    const closedCells = this.cellsAround(field).filter((cell) => !cell.open);
+    closedCells.forEach((cell) => {
+      if (!cell.flagged) {
+        const cellElement = document.querySelector(
+          `[data-x="${cell.x}"][data-y="${cell.y}"]`
+        );
+        cellElement.classList.remove("closed");
+        cellElement.classList.add("opened");
+      }
+    });
+  }
+
+  stopSpying(field) {
+    const closedCells = this.cellsAround(field).filter((cell) => !cell.open);
+    closedCells.forEach((cell) => {
+      const cellElement = document.querySelector(
+        `[data-x="${cell.x}"][data-y="${cell.y}"]`
+      );
+      cellElement.classList.add("closed");
+      cellElement.classList.remove("opened");
+    });
+  }
 }
 
 export default Cell;

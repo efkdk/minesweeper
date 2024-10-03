@@ -26,18 +26,34 @@ const configs = {
   },
 };
 
-const handleCellClick = (target) => {
+const handleCellClick = (target, type) => {
   const field = selectField();
   const x = +target.dataset.x;
   const y = +target.dataset.y;
-  field[y][x].click(field);
+  switch (type) {
+    case "click":
+      field[y][x].click(field);
+      break;
+    case "flag":
+      field[y][x].flag();
+      break;
+    case "startSpying":
+      Context.setState({ spy: field[y][x] });
+      field[y][x].startSpying(field);
+      break;
+    case "stopSpying":
+      field[y][x].stopSpying(field);
+      break;
+    default:
+      field[y][x].click(field);
+  }
 };
 
 document.addEventListener("click", (event) => {
   const { target } = event;
 
   if (target.classList.contains("cell")) {
-    handleCellClick(target);
+    handleCellClick(target, "click");
   } else if (target.id === "restart") {
     restartGame();
   } else if (target.id === "custom") {
@@ -54,12 +70,10 @@ document.addEventListener("click", (event) => {
 });
 
 document.addEventListener("contextmenu", (event) => {
+  const { target } = event;
   event.preventDefault();
-  if (event.target.classList.contains("cell")) {
-    const field = selectField();
-    const x = +event.target.dataset.x;
-    const y = +event.target.dataset.y;
-    field[y][x].flag();
+  if (target.classList.contains("cell")) {
+    handleCellClick(target, "flag");
   }
 });
 
@@ -90,11 +104,27 @@ sizeSelect.addEventListener("change", (event) => {
   setStyles();
 });
 
+document.addEventListener("mousedown", (event) => {
+  const { target } = event;
+  if (target.classList.contains("cell") && event.button === 0) {
+    handleCellClick(target, "startSpying");
+  }
+});
+
+document.addEventListener("mouseup", (event) => {
+  if (event.button !== 0) return;
+  const { spy } = Context.getState();
+  const field = selectField();
+  if (spy) {
+    spy.stopSpying(field);
+    Context.setState({ spy: null });
+  }
+});
+
 document.addEventListener("DOMContentLoaded", () => {
   let settings = localStorage.getItem("settings");
   if (typeof settings === "string") {
     settings = JSON.parse(settings);
-    console.log(settings);
     Context.setState(settings);
   } else {
     const isPrefersDarkTheme = window.matchMedia(

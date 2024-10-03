@@ -10,7 +10,7 @@ const restartButton = document.getElementById("restart");
  * @param {Array} field
  * @returns {number}
  */
-export const checkBombsAround = (cell) => {
+const checkBombsAround = (cell) => {
   const field = selectField();
   return cell.cellsAround(field).filter((cell) => cell.bomb).length;
 };
@@ -20,7 +20,7 @@ export const checkBombsAround = (cell) => {
  * @param {Array} field
  * @returns {void}
  */
-export const openNeighborCells = (cell, field) => {
+const openNeighborCells = (cell, field) => {
   let toOpen = [cell];
   while (toOpen.length > 0) {
     const current = toOpen.pop();
@@ -43,7 +43,7 @@ export const openNeighborCells = (cell, field) => {
  * @param {Object} settings
  * @returns {Array}
  */
-export const generateBombs = (field, { width, height, bombs }) => {
+const generateBombs = (field, { width, height, bombs }) => {
   let bombsPlaced = 0;
   while (bombsPlaced < bombs) {
     let x = Math.floor(Math.random() * width);
@@ -61,7 +61,7 @@ export const generateBombs = (field, { width, height, bombs }) => {
  * @param {Array} field
  * @returns {void}
  */
-export const gameOver = (field) => {
+const gameOver = (field) => {
   const classes = ["restart-button", "lose"];
   restartButton.classList.value = classes.join(" ");
   Timer.stop();
@@ -73,7 +73,7 @@ export const gameOver = (field) => {
   });
 };
 
-export const checkGameWin = (field) => {
+const checkGameWin = (field) => {
   let openCells = field.flat().filter((cell) => cell.open).length;
   let width = field[0].length;
   let height = field.length;
@@ -122,7 +122,7 @@ const renderField = () => {
   root.appendChild(fragment);
 };
 
-export const restartGame = () => {
+const restartGame = () => {
   root.innerHTML = "";
   const classes = ["restart-button"];
   restartButton.classList.value = classes.join(" ");
@@ -130,9 +130,19 @@ export const restartGame = () => {
   startGame();
 };
 
-export const startGame = () => {
+const startGame = () => {
   Context.setState({ field: createField(), flags: Context.getState().bombs });
   renderField();
   updateFlagsCount();
   setStyles();
+};
+
+export {
+  checkBombsAround,
+  openNeighborCells,
+  generateBombs,
+  gameOver,
+  checkGameWin,
+  restartGame,
+  startGame,
 };
