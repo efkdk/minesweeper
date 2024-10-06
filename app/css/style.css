@@ -9,6 +9,7 @@
 html.light {
   --background-color: #ffffff;
   --background-hover-color: #f1f1f1;
+  --modal-background-color: #f8f8f8;
   --border-hover-color: #b3b3b3;
   --border-color: #cccccc;
   --cell-background-color: #c6c6c6;
@@ -29,6 +30,7 @@ html.light {
 html.dark {
   --background-color: #181a1b;
   --background-hover-color: #444444;
+  --modal-background-color: #202428;
   --border-hover-color: #b3b3b3;
   --border-color: #cccccc;
   --cell-background-color: #4c545c;
@@ -98,15 +100,89 @@ body {
   color: var(--text-color);
 }
 
+@media (max-width: 37rem) {
+  .levels {
+    flex-wrap: wrap;
+    gap: 0.5rem !important;
+  }
+  .title {
+    font-size: 1.65rem;
+  }
+  #theme-toggler {
+    top: 5.75rem;
+  }
+}
+
 .wrapper {
+  position: relative;
   width: fit-content;
   border: calc(var(--cell-size) * 0.1875) solid;
   border-color: var(--minesweeper-second-border-color)
     var(--minesweeper-first-border-color) var(--minesweeper-first-border-color)
     var(--minesweeper-second-border-color);
   box-shadow: 0px 0px 0.5px 0.5px rgba(0, 0, 0, 0.75);
+}
 
-  margin-bottom: 1.5rem;
+.modal {
+  display: none;
+}
+
+.modal._active {
+  position: absolute;
+  width: 12.5rem;
+  top: 50%;
+  right: -13.5rem;
+  transform: translate(0, -50%);
+
+  padding: 1rem;
+  font-size: 1rem;
+  color: var(--text-color);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--modal-background-color);
+  z-index: 1;
+
+  border: calc(var(--cell-size) * 0.09375) solid;
+  border-color: var(--minesweeper-second-border-color)
+    var(--minesweeper-first-border-color) var(--minesweeper-first-border-color)
+    var(--minesweeper-second-border-color);
+}
+
+.modal__text {
+  position: relative;
+  margin-bottom: 0.5rem;
+
+  font-size: 1.125rem;
+}
+
+.modal__text::after {
+  content: "";
+  position: absolute;
+  bottom: -0.5rem;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: 10rem;
+  height: 0.0625rem;
+  background-color: var(--text-color);
+}
+
+@media (max-width: 48rem) {
+  .modal._active {
+    bottom: -9rem;
+    left: 50%;
+    top: unset;
+    right: unset;
+    transform: translate(-50%, 0);
+  }
+}
+
+html.light .modal {
+  box-shadow: -0.5px -0.5px 0 0.5px #485058, 0 0 0 1px #0a0c0e,
+    -0.5px -0.5px 0 1.5px #485058, 0 0 0 2px #0a0c0e;
 }
 
 .root-wrapper {
@@ -155,13 +231,13 @@ body {
   border-color: var(--minesweeper-first-border-color)
     var(--minesweeper-second-border-color)
     var(--minesweeper-second-border-color) var(--minesweeper-first-border-color);
-  /* background: url("../img/numbers-panel.svg") center no-repeat; */
   background-color: #000000;
-  background-size: cover;
 }
 
 .counter__element {
   overflow: hidden;
+  background-image: url("../img/num-bg.svg");
+  background-size: cover;
   width: calc(var(--cell-size) * 2.5625 - (var(--cell-size) * 0.125 * 2));
   height: 100%;
 }

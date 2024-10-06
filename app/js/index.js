@@ -53,6 +53,8 @@ document.addEventListener("click", (event) => {
   const { target } = event;
 
   if (target.classList.contains("cell")) {
+    let { clicks } = Context.getState();
+    Context.setState({ clicks: ++clicks });
     handleCellClick(target, "click");
   } else if (target.id === "restart") {
     restartGame();
@@ -73,6 +75,8 @@ document.addEventListener("contextmenu", (event) => {
   const { target } = event;
   event.preventDefault();
   if (target.classList.contains("cell")) {
+    let { clicks } = Context.getState();
+    Context.setState({ clicks: ++clicks });
     handleCellClick(target, "flag");
   }
 });

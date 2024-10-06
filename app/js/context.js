@@ -1,6 +1,8 @@
 const Context = (() => {
   //initial state
-  let state = {};
+  let state = {
+    clicks: 0,
+  };
 
   let listeners = [];
 

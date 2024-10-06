@@ -19,9 +19,15 @@ class TimerClass {
   }
 
   reset() {
-    clearInterval(this.timer);
-    this.seconds = 0;
+    this.stop();
     updateTimer(this.seconds);
+  }
+
+  getTime() {
+    const hours = Math.floor(this.seconds / 3600);
+    const minutes = Math.floor((this.seconds % 3600) / 60);
+    const seconds = this.seconds % 60;
+    return { hours, minutes, seconds };
   }
 }
 

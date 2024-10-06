@@ -59,11 +59,11 @@ const generateBombs = (field, { width, height, bombs }) => {
 
 /**
  * @param {Array} field
+ * @param {string} type
  * @returns {void}
  */
-const gameOver = (field) => {
-  const classes = ["restart-button", "lose"];
-  restartButton.classList.value = classes.join(" ");
+const handleGameEnd = (field, type) => {
+  showStats(type);
   Timer.stop();
   eachCell(field, (cell) => {
     if (!cell.open) {
@@ -71,6 +71,16 @@ const gameOver = (field) => {
       cell.draw(field);
     }
   });
+};
+
+/**
+ * @param {Array} field
+ * @returns {void}
+ */
+const gameOver = (field) => {
+  const classes = ["restart-button", "lose"];
+  restartButton.classList.value = classes.join(" ");
+  handleGameEnd(field, "lose");
 };
 
 const checkGameWin = (field) => {
@@ -81,14 +91,7 @@ const checkGameWin = (field) => {
   if (openCells === width * height - bombs) {
     const classes = ["restart-button", "win"];
     restartButton.classList.value = classes.join(" ");
-    console.log(Timer);
-    Timer.stop();
-    eachCell(field, (cell) => {
-      if (!cell.open) {
-        cell.open = true;
-        cell.draw(field);
-      }
-    });
+    handleGameEnd(field, "win");
   }
 };
 
@@ -127,6 +130,7 @@ const restartGame = () => {
   const classes = ["restart-button"];
   restartButton.classList.value = classes.join(" ");
   Timer.reset();
+  closeStats();
   startGame();
 };
 
@@ -135,6 +139,30 @@ const startGame = () => {
   renderField();
   updateFlagsCount();
   setStyles();
+};
+
+const showStats = (gameStatus) => {
+  const modal = document.querySelector(".modal");
+  const clicksOutput = document.getElementById("stats-clicks");
+  const timerOutput = document.getElementById("stats-time");
+  const gameStatusOutput = document.getElementById("stats-gameStatus");
+  const { hours, minutes, seconds } = Timer.getTime();
+  const { clicks } = Context.getState();
+  gameStatusOutput.textContent =
+    gameStatus === "win" ? "You win :)" : "You lose :(";
+  timerOutput.textContent = `${
+    hours !== 0 ? `${hours !== 1 ? `${hours} hours` : "1 hour"}` : ""
+  } ${
+    minutes !== 0 ? `${minutes !== 1 ? `${minutes} minutes` : "1 minute"}` : ""
+  } ${seconds !== 1 ? `${seconds} seconds` : "1 second"} (${Timer.seconds}s)`;
+  clicksOutput.textContent = clicks;
+  modal.classList.add("_active");
+};
+
+const closeStats = () => {
+  const modal = document.querySelector(".modal");
+  modal.classList.remove("_active");
+  Context.setState({ clicks: 0 });
 };
 
 export {
