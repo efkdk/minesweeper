@@ -1,9 +1,10 @@
 import Context, { selectField } from "./context.js";
 import { setStyles, validateConfig } from "./helpers.js";
-import { restartGame, startGame } from "./game.js";
+import { prepareGame, safeStart, restartGame, startGame } from "./game.js";
 
 const sizeSelect = document.getElementById("size-select");
 const customSettings = document.getElementById("custom-settings");
+const switcher = document.getElementById("switcher");
 
 const configs = {
   novice: {
@@ -51,9 +52,15 @@ const handleCellClick = (target, type) => {
 
 document.addEventListener("click", (event) => {
   const { target } = event;
+  let { clicks } = Context.getState();
+  const { isFirstSafeClick } = Context.getState();
 
   if (target.classList.contains("cell")) {
-    let { clicks } = Context.getState();
+    if (clicks === 0 && isFirstSafeClick) {
+      const x = +target.dataset.x;
+      const y = +target.dataset.y;
+      safeStart({ x, y });
+    }
     Context.setState({ clicks: ++clicks });
     handleCellClick(target, "click");
   } else if (target.id === "restart") {
@@ -62,12 +69,18 @@ document.addEventListener("click", (event) => {
     customSettings.classList.toggle("_active");
   } else if (["novice", "amateur", "professional"].includes(target.id)) {
     customSettings.classList.remove("_active");
-    Context.setState(configs[target.id]);
+    Context.setState({
+      ...configs[target.id],
+      flags: configs[target.id].bombs,
+    });
     restartGame();
   } else if (target.id === "theme-toggler") {
     const { theme } = Context.getState();
     Context.setState({ theme: theme === "light" ? "dark" : "light" });
     setStyles();
+  } else if (target.id === "switcher") {
+    Context.setState({ isFirstSafeClick: switcher.checked });
+    restartGame();
   }
 });
 
@@ -95,7 +108,8 @@ customSettings.addEventListener("submit", (event) => {
   };
 
   //set config after validation
-  Context.setState(validateConfig(customSettingsObject));
+  const safeConfig = validateConfig(customSettingsObject);
+  Context.setState({ ...safeConfig, flags: safeConfig.bombs });
   const { width, height, bombs } = Context.getState();
   widthInput.value = width;
   heightInput.value = height;
@@ -110,7 +124,8 @@ sizeSelect.addEventListener("change", (event) => {
 
 document.addEventListener("mousedown", (event) => {
   const { target } = event;
-  if (target.classList.contains("cell") && event.button === 0) {
+  const { clicks } = Context.getState();
+  if (target.classList.contains("cell") && event.button === 0 && clicks !== 0) {
     handleCellClick(target, "startSpying");
   }
 });
@@ -139,6 +154,8 @@ document.addEventListener("DOMContentLoaded", () => {
       theme: isPrefersDarkTheme.matches ? "dark" : "light",
       ...configs.novice,
       size: 24,
+      isFirstSafeClick: true,
+      flags: configs.novice.bombs,
     });
   }
 
@@ -152,11 +169,20 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   sizeSelect.value = Context.getState().size;
-  startGame();
+
+  const { isFirstSafeClick } = Context.getState();
+  if (!isFirstSafeClick) {
+    switcher.checked = false;
+    startGame();
+  } else {
+    switcher.checked = true;
+    prepareGame();
+  }
 });
 
 window.addEventListener("beforeunload", () => {
-  const { theme, width, height, bombs, size, configName } = Context.getState();
+  const { theme, width, height, bombs, size, configName, isFirstSafeClick } =
+    Context.getState();
   localStorage.setItem(
     "settings",
     JSON.stringify({
@@ -164,8 +190,10 @@ window.addEventListener("beforeunload", () => {
       width,
       height,
       bombs,
+      flags: bombs,
       size,
       configName,
+      isFirstSafeClick: isFirstSafeClick,
     })
   );
 });

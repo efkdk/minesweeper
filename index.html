@@ -56,7 +56,8 @@
                   </select>
                 </div>
               </label>
-              <div class="more-settings"></div>
+              <!-- <div class="more-settings"></div> -->
+              <!-- No need in this now :) -->
             </div>
           </div>
           <form class="settings__custom" id="custom-settings">
@@ -95,6 +96,13 @@
             <button type="submit" class="button">Apply</button>
           </form>
         </div>
+        <div class="safe-click-toggler">
+          <label class="switch">
+            <input type="checkbox" style="opacity: 0; width: 0; height: 0" id="switcher"/>
+            <span class="slider"></span>
+          </label>
+          <p>First safe click</p>
+        </div>
         <div class="wrapper">
           <div class="root-wrapper">
             <div class="header-wrapper">
@@ -121,7 +129,7 @@
             <p>3BV/s: <span id="stats-3bvs"></span></p> -->
             <p>Clicks: <span id="stats-clicks"></span></p>
             <!-- <p>Efficiency: <span id="stats-efficiency"></span></p> -->
-             <!-- Add in future -->
+            <!-- Add in future -->
           </div>
         </div>
       </div>

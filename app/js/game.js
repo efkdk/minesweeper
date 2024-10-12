@@ -43,13 +43,20 @@ const openNeighborCells = (cell, field) => {
  * @param {Object} settings
  * @returns {Array}
  */
-const generateBombs = (field, { width, height, bombs }) => {
+const generateBombs = (field, { width, height, bombs }, fistClick) => {
   let bombsPlaced = 0;
+
+  const _isSafeZone = (x, y) => {
+    if (!fistClick) return false;
+    const { x: firstClickX, y: firstClickY } = fistClick;
+    return Math.abs(x - firstClickX) <= 1 && Math.abs(y - firstClickY) <= 1;
+  };
+
   while (bombsPlaced < bombs) {
     let x = Math.floor(Math.random() * width);
     let y = Math.floor(Math.random() * height);
 
-    if (!field[y][x].bomb) {
+    if (!field[y][x].bomb && !_isSafeZone(x, y)) {
       field[y][x].bomb = true;
       bombsPlaced++;
     }
@@ -97,7 +104,7 @@ const checkGameWin = (field) => {
 
 const createField = () => {
   let field = [];
-  const { width, height, bombs } = Context.getState();
+  const { width, height } = Context.getState();
   for (let y = 0; y < height; y++) {
     let row = [];
     for (let x = 0; x < width; x++) {
@@ -105,40 +112,62 @@ const createField = () => {
     }
     field.push(row);
   }
-  return generateBombs(field, { width, height, bombs });
+  return field;
 };
 
 const renderField = () => {
   root.innerHTML = "";
   const fragment = document.createDocumentFragment();
-  const field = selectField();
+  const { width, height } = Context.getState();
 
-  eachCell(field, (cell) => {
-    const { size } = Context.getState();
-    let cellElement = document.createElement("div");
-    cellElement.classList.add("cell", "closed", `size-${size}`);
-    cellElement.dataset.x = cell.x;
-    cellElement.dataset.y = cell.y;
-    fragment.appendChild(cellElement);
-  });
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let cellElement = document.createElement("div");
+      cellElement.classList.add("cell", "closed");
+      cellElement.dataset.x = x;
+      cellElement.dataset.y = y;
+      fragment.appendChild(cellElement);
+    }
+  }
 
+  setStyles();
   root.appendChild(fragment);
 };
 
 const restartGame = () => {
+  const { isFirstSafeClick } = Context.getState();
   root.innerHTML = "";
   const classes = ["restart-button"];
   restartButton.classList.value = classes.join(" ");
   Timer.reset();
   closeStats();
-  startGame();
+  if (isFirstSafeClick) {
+    prepareGame();
+  } else {
+    startGame();
+  }
+};
+
+const prepareGame = () => {
+  const field = createField();
+  Context.setState({ field, flags: Context.getState().bombs });
+  renderField();
+  updateFlagsCount();
+};
+
+const safeStart = (firstClick) => {
+  const field = selectField();
+  const fieldWithBombs = generateBombs(field, Context.getState(), firstClick);
+  Context.setState({ field: fieldWithBombs });
 };
 
 const startGame = () => {
-  Context.setState({ field: createField(), flags: Context.getState().bombs });
+  const field = createField();
+
+  const fieldWithBombs = generateBombs(field, Context.getState());
+  Context.setState({ field: fieldWithBombs, flags: Context.getState().bombs });
   renderField();
   updateFlagsCount();
-  setStyles();
 };
 
 const showStats = (gameStatus) => {
@@ -172,5 +201,7 @@ export {
   gameOver,
   checkGameWin,
   restartGame,
+  prepareGame,
+  safeStart,
   startGame,
 };
