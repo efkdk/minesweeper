@@ -1,31 +1,11 @@
 import Context, { selectField } from "./context.js";
 import { setStyles, validateConfig } from "./helpers.js";
 import { prepareGame, safeStart, restartGame, startGame } from "./game.js";
+import configs from "./constants.js";
 
 const sizeSelect = document.getElementById("size-select");
 const customSettings = document.getElementById("custom-settings");
 const switcher = document.getElementById("switcher");
-
-const configs = {
-  novice: {
-    width: 9,
-    height: 9,
-    bombs: 10,
-    configName: "novice",
-  },
-  amateur: {
-    width: 16,
-    height: 16,
-    bombs: 40,
-    configName: "amateur",
-  },
-  professional: {
-    width: 30,
-    height: 16,
-    bombs: 99,
-    configName: "professional",
-  },
-};
 
 const handleCellClick = (target, type) => {
   const field = selectField();
@@ -50,7 +30,12 @@ const handleCellClick = (target, type) => {
   }
 };
 
-document.addEventListener("click", (event) => {
+const incrementClicks = () => {
+  const { clicks } = Context.getState();
+  Context.setState({ clicks: clicks + 1 });
+};
+
+const handleClick = (event) => {
   const { target } = event;
   let { clicks } = Context.getState();
   const { isFirstSafeClick } = Context.getState();
@@ -61,7 +46,7 @@ document.addEventListener("click", (event) => {
       const y = +target.dataset.y;
       safeStart({ x, y });
     }
-    Context.setState({ clicks: ++clicks });
+    incrementClicks();
     handleCellClick(target, "click");
   } else if (target.id === "restart") {
     restartGame();
@@ -82,19 +67,18 @@ document.addEventListener("click", (event) => {
     Context.setState({ isFirstSafeClick: switcher.checked });
     restartGame();
   }
-});
+};
 
-document.addEventListener("contextmenu", (event) => {
+const handleRightClick = (event) => {
   const { target } = event;
   event.preventDefault();
   if (target.classList.contains("cell")) {
-    let { clicks } = Context.getState();
-    Context.setState({ clicks: ++clicks });
+    incrementClicks();
     handleCellClick(target, "flag");
   }
-});
+};
 
-customSettings.addEventListener("submit", (event) => {
+const handleCustomSubmit = (event) => {
   event.preventDefault();
   const widthFromSettings = +widthInput.value;
   const heightFromSettings = +heightInput.value;
@@ -115,22 +99,22 @@ customSettings.addEventListener("submit", (event) => {
   heightInput.value = height;
   bombsInput.value = bombs;
   restartGame();
-});
+};
 
-sizeSelect.addEventListener("change", (event) => {
+const handleSizeChange = (event) => {
   Context.setState({ size: +event.target.value });
   setStyles();
-});
+};
 
-document.addEventListener("mousedown", (event) => {
+const handleMouseDown = (event) => {
   const { target } = event;
   const { clicks } = Context.getState();
   if (target.classList.contains("cell") && event.button === 0 && clicks !== 0) {
     handleCellClick(target, "startSpying");
   }
-});
+};
 
-document.addEventListener("mouseup", (event) => {
+const handleMouseUp = (event) => {
   if (event.button !== 0) return;
   const { spy } = Context.getState();
   const field = selectField();
@@ -138,9 +122,9 @@ document.addEventListener("mouseup", (event) => {
     spy.stopSpying(field);
     Context.setState({ spy: null });
   }
-});
+};
 
-document.addEventListener("DOMContentLoaded", () => {
+const handleDocumentLoaded = () => {
   let settings = localStorage.getItem("settings");
   if (typeof settings === "string") {
     settings = JSON.parse(settings);
@@ -178,9 +162,9 @@ document.addEventListener("DOMContentLoaded", () => {
     switcher.checked = true;
     prepareGame();
   }
-});
+};
 
-window.addEventListener("beforeunload", () => {
+const handleDocumentUnload = () => {
   const { theme, width, height, bombs, size, configName, isFirstSafeClick } =
     Context.getState();
   localStorage.setItem(
@@ -196,4 +180,19 @@ window.addEventListener("beforeunload", () => {
       isFirstSafeClick: isFirstSafeClick,
     })
   );
+};
+
+const attachEventListeners = () => {
+  document.addEventListener("click", handleClick);
+  document.addEventListener("contextmenu", handleRightClick);
+  document.addEventListener("mousedown", handleMouseDown);
+  document.addEventListener("mouseup", handleMouseUp);
+  window.addEventListener("beforeunload", handleDocumentUnload);
+  customSettings.addEventListener("submit", handleCustomSubmit);
+  sizeSelect.addEventListener("change", handleSizeChange);
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  attachEventListeners();
+  handleDocumentLoaded();
 });

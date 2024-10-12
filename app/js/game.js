@@ -116,7 +116,6 @@ const createField = () => {
 };
 
 const renderField = () => {
-  root.innerHTML = "";
   const fragment = document.createDocumentFragment();
   const { width, height } = Context.getState();
 
@@ -131,6 +130,7 @@ const renderField = () => {
   }
 
   setStyles();
+  root.innerHTML = "";
   root.appendChild(fragment);
 };
 
