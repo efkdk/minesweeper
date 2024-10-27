@@ -182,11 +182,30 @@ const handleDocumentUnload = () => {
   );
 };
 
+const handleTouchStart = (event) => {
+  const { target } = event;
+  const { clicks } = Context.getState();
+  if (target.classList.contains("cell") && clicks !== 0) {
+    handleCellClick(target, "startSpying");
+  }
+};
+
+const handleTouchEnd = () => {
+  const { spy } = Context.getState();
+  const field = selectField();
+  if (spy) {
+    spy.stopSpying(field);
+    Context.setState({ spy: null });
+  }
+};
+
 const attachEventListeners = () => {
   document.addEventListener("click", handleClick);
   document.addEventListener("contextmenu", handleRightClick);
   document.addEventListener("mousedown", handleMouseDown);
   document.addEventListener("mouseup", handleMouseUp);
+  document.addEventListener("touchstart", handleTouchStart);
+  document.addEventListener("touchend", handleTouchEnd);
   window.addEventListener("beforeunload", handleDocumentUnload);
   customSettings.addEventListener("submit", handleCustomSubmit);
   sizeSelect.addEventListener("change", handleSizeChange);
