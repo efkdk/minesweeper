@@ -235,6 +235,8 @@ html.light .modal {
 }
 
 .counter__element {
+  position: relative;
+
   overflow: hidden;
   background-image: url("../img/num-bg.svg");
   background-size: cover;
@@ -242,57 +244,134 @@ html.light .modal {
   height: 100%;
 }
 
-.counter__element.type-num- {
+.counter__element.type-num-::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
   background: url("../img/num-.svg");
   background-size: contain;
 }
 
-.counter__element.type-num0 {
+.counter__element.type-num0::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
   background: url("../img/num0.svg") center no-repeat;
   background-size: contain;
 }
 
-.counter__element.type-num1 {
+.counter__element.type-num1::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
   background: url("../img/num1.svg") center no-repeat;
   background-size: contain;
 }
 
-.counter__element.type-num2 {
+.counter__element.type-num2::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
   background: url("../img/num2.svg") center no-repeat;
   background-size: contain;
 }
 
-.counter__element.type-num3 {
+.counter__element.type-num3::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
   background: url("../img/num3.svg") center no-repeat;
   background-size: contain;
 }
 
-.counter__element.type-num4 {
+.counter__element.type-num4::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
   background: url("../img/num4.svg") center no-repeat;
   background-size: contain;
 }
 
-.counter__element.type-num5 {
+.counter__element.type-num5::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
   background: url("../img/num5.svg") center no-repeat;
   background-size: contain;
 }
 
-.counter__element.type-num6 {
+.counter__element.type-num6::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
   background: url("../img/num6.svg") center no-repeat;
   background-size: contain;
 }
 
-.counter__element.type-num7 {
+.counter__element.type-num7::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
   background: url("../img/num7.svg") center no-repeat;
   background-size: contain;
 }
 
-.counter__element.type-num8 {
+.counter__element.type-num8::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
   background: url("../img/num8.svg") center no-repeat;
   background-size: contain;
 }
 
-.counter__element.type-num9 {
+.counter__element.type-num9::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
   background: url("../img/num9.svg") center no-repeat;
   background-size: contain;
 }
